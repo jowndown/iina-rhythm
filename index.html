@@ -64,7 +64,7 @@
       #progressBar{ height:100%; width:0%; background:linear-gradient(90deg,var(--teal),var(--amber)); }
 
       /* lanes (DDR style: 4 lanes, notes fall from top to bottom) */
-      #lane{ position:absolute; left:0; right:0; top:10%; height:62%; min-height:200px; }
+      #lane{ position:absolute; left:0; right:0; top:10%; height:70%; min-height:200px; }
       #laneCols{ position:relative; width:min(94vw,520px); height:100%; margin:0 auto;
         display:flex; background:rgba(8,26,32,.45); border:1px solid rgba(255,255,255,.10);
         border-radius:10px; overflow:hidden; }
@@ -78,8 +78,9 @@
         width:64px; height:64px; pointer-events:none; }
       .target .ring{ position:absolute; inset:0; border-radius:50%; border:4px solid var(--lane-c,#fff);
         background:rgba(255,255,255,.06); box-shadow:0 0 14px rgba(0,0,0,.25); }
-      .target .arrow{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-        font-size:26px; color:var(--lane-c,#fff); text-shadow:0 1px 4px rgba(0,0,0,.45); }
+      .target .dot{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+        width:27px; height:27px; border-radius:50%; background:var(--lane-c,#fff);
+        box-shadow:0 0 10px rgba(0,0,0,.25), 0 0 0 3px rgba(255,255,255,.25) inset; }
       .target.t0{ --lane-c:var(--amber); }
       .target.t1{ --lane-c:var(--pink); }
       .target.t2{ --lane-c:var(--teal); }
@@ -99,6 +100,8 @@
       .note.n2{ background:radial-gradient(circle at 35% 30%,#c8f7e9,var(--teal)); }
       .note.n3{ background:radial-gradient(circle at 35% 30%,#ffd9ae,#ffb066); }
       .note.missed{ transition:opacity .3s; opacity:.25; }
+      .note::after{ content:""; width:34%; height:34%; border-radius:50%;
+        background:rgba(255,255,255,.55); box-shadow:0 0 0 2px rgba(255,255,255,.18); }
 
       #judgePopup{ position:absolute; left:50%; bottom:112px; transform:translateX(-50%); z-index:5;
         font-size:clamp(22px,4.6vmin,38px); font-weight:800; letter-spacing:.06em; opacity:0; pointer-events:none;
@@ -142,9 +145,20 @@
       .fcBadge{ display:inline-block; background:var(--pink); color:#40222b; font-weight:800; border-radius:999px;
         padding:4px 16px; font-size:14px; margin-top:4px; }
       .btnRow{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+      .modeDivider{ display:flex; align-items:center; gap:12px; margin:16px 4px 12px; color:var(--ink-dim); font-size:12px; font-weight:700; letter-spacing:.12em; }
+      .modeDivider::before,.modeDivider::after{ content:""; flex:1; height:1px; background:rgba(255,255,255,.18); }
+      .fileBtn{ border:2px dashed rgba(127,227,200,.65); background:rgba(127,227,200,.10); color:var(--ink);
+        border-radius:16px; padding:13px 18px; font-size:15.5px; font-weight:800; min-height:54px; width:100%; }
+      .fileBtn:active{ transform:scale(.98); }
+      .fileInfo{ margin-top:10px; font-size:13.5px; line-height:1.6; color:var(--ink-dim); word-break:break-all; }
+      .fileInfo b{ color:var(--ink); }
+      .fileStatus{ margin-top:6px; font-size:13px; font-weight:700; color:var(--teal); min-height:1.4em; }
+      .fileStatus.err{ color:#ff9fb6; }
+      .customStart{ margin-top:10px; width:100%; }
+      .customStart:disabled{ opacity:.45; filter:grayscale(.4); }
 
       /* ---------- stage / dancers ---------- */
-      #stage{ position:relative; z-index:2; flex:0 0 auto; height:27dvh; min-height:118px; max-height:230px;
+      #stage{ position:relative; z-index:2; flex:0 0 auto; height:27dvh; min-height:128px; max-height:230px;
         background:linear-gradient(180deg,#57a773 0%,#3d8b5f 26%,#2c6e47 100%);
         border-top:4px solid #79c48f; overflow:visible; }
       #stage::before{ content:""; position:absolute; left:0; right:0; top:10px; height:14px;
@@ -154,7 +168,7 @@
         background-size:190px 14px; background-repeat:repeat-x; opacity:.8; }
       #dancers{ position:absolute; left:0; right:0; bottom:6px; display:flex; justify-content:center;
         align-items:flex-end; gap:1.2vmin; padding:0 8px; }
-      .dancer{ width:clamp(52px,12.5vmin,102px); flex:0 1 auto; }
+      .dancer{ width:clamp(60px,15vmin,112px); flex:0 1 auto; }
       .dancer .rollw{ will-change:transform; }
       .dancer .bob{ transform-origin:50% 100%; will-change:transform; }
       .dancer svg{ display:block; width:100%; height:auto; }
@@ -162,9 +176,9 @@
 
       .hidden{ display:none !important; }
       @media (orientation:portrait){
-        #lane{ top:9%; height:58%; }
+        #lane{ top:9%; height:74%; }
         .target{ width:56px; height:56px; bottom:38px; }
-        .target .arrow{ font-size:22px; }
+        .target .dot{ width:23px; height:23px; }
         .note{ width:46px; height:46px; margin:-23px 0 0 -23px; font-size:19px; }
         #hud .box{ min-width:88px; padding:5px 10px; }
         #hud .value{ font-size:19px; }
@@ -194,23 +208,23 @@
           <div id="laneCols">
             <div class="col" data-lane="0">
               <div class="pad"></div>
-              <div class="target t0"><div class="ring"></div><div class="arrow">◀</div></div>
-              <div class="keyHint">D ・ ←</div>
+              <div class="target t0"><div class="ring"></div><div class="dot"></div></div>
+              <div class="keyHint">D</div>
             </div>
             <div class="col" data-lane="1">
               <div class="pad"></div>
-              <div class="target t1"><div class="ring"></div><div class="arrow">▼</div></div>
-              <div class="keyHint">F ・ ↓</div>
+              <div class="target t1"><div class="ring"></div><div class="dot"></div></div>
+              <div class="keyHint">F</div>
             </div>
             <div class="col" data-lane="2">
               <div class="pad"></div>
-              <div class="target t2"><div class="ring"></div><div class="arrow">▲</div></div>
-              <div class="keyHint">J ・ ↑</div>
+              <div class="target t2"><div class="ring"></div><div class="dot"></div></div>
+              <div class="keyHint">J</div>
             </div>
             <div class="col" data-lane="3">
               <div class="pad"></div>
-              <div class="target t3"><div class="ring"></div><div class="arrow">▶</div></div>
-              <div class="keyHint">K ・ →</div>
+              <div class="target t3"><div class="ring"></div><div class="dot"></div></div>
+              <div class="keyHint">K</div>
             </div>
             <div id="notes"></div>
           </div>
@@ -224,13 +238,20 @@
             <p class="subtitle">もりの なかまと おどる、ほのぼの リズムゲーム</p>
             <div class="howto">
               <div>♪ ノーツが <b>4つのレーン</b> を 上から 落ちてくるよ</div>
-              <div>♪ レーン下の <b>矢印</b> に 重なった瞬間に、そのレーンを タップ！</div>
+              <div>♪ レーン下の <b>丸いターゲット</b> に 重なった瞬間に、そのレーンを タップ！</div>
               <div>♪ PCでは <b>D F J K</b> キー（矢印キーでもOK）</div>
               <div>♪ コンボを つなぐと なかまが ふえるよ</div>
               <div>♪ みんな たまに <b>でんぐり返り</b> するよ</div>
             </div>
-            <button class="bigBtn" id="btnStart" type="button">▶ スタート</button>
-            <p class="note-line">BGMは このゲームの オリジナル曲（約80秒）です。横向きが おすすめです。</p>
+            <button class="bigBtn" id="btnStart" type="button">▶ オリジナル曲で遊ぶ</button>
+            <p class="note-line" style="margin-top:8px">内蔵のオリジナル曲（約80秒）で遊べます</p>
+            <div class="modeDivider">または</div>
+            <input type="file" id="fileInput" accept="audio/*,.m4a,.mp3,.wav,.aac,.ogg,.flac" class="hidden" />
+            <button class="fileBtn" id="btnPickFile" type="button">♪ 曲ファイルを選んで遊ぶ</button>
+            <div class="fileInfo" id="fileInfo">スマホやPCの中の曲（m4a / mp3 / wav など）を選ぶと、<br>音に合わせて譜面を自動で作ります。</div>
+            <div class="fileStatus" id="fileStatus"></div>
+            <button class="bigBtn customStart hidden" id="btnStartCustom" type="button">▶ この曲でスタート</button>
+            <p class="note-line">選んだファイルは端末の外に送信されません。このページの中だけで読み込み・解析します。横向きがおすすめです。</p>
           </div>
         </div>
 
@@ -363,13 +384,139 @@
     });
     chartNotes.sort(function (a, b) { return a.beat - b.beat; });
 
-    /* 4 lanes (DDR order ◀ ▼ ▲ ▶): low notes left, high notes right */
-    var LANE_GLYPH = ["◀", "▼", "▲", "▶"];
+    /* 4 lanes: low notes left, high notes right; each lane has its own colour */
     function laneForMidi(m) {
       if (m <= 74) return 0; /* B4 C5 D5 */
       if (m <= 77) return 1; /* E5 F5 */
       if (m <= 79) return 2; /* G5 */
       return 3;              /* A5 B5 C6 */
+    }
+
+    /* ---------- custom file mode: state ---------- */
+    var gameMode = "builtin"; /* builtin | custom */
+    var customBuffer = null, customDuration = 0, customChartData = [], customSPB = 0.5, customBPM = 120, customFileName = "", customSource = null;
+
+    /* ---------- onset / pitch analysis (all local, in-memory) ---------- */
+    function fftMagnitudes(re, im) {
+      var n = re.length, i, j, len, ang;
+      for (i = 1, j = 0; i < n; i++) {
+        var bit = n >> 1;
+        for (; j & bit; bit >>= 1) j ^= bit;
+        j ^= bit;
+        if (i < j) { var tr = re[i]; re[i] = re[j]; re[j] = tr; var ti = im[i]; im[i] = im[j]; im[j] = ti; }
+      }
+      for (len = 2; len <= n; len <<= 1) {
+        ang = -2 * Math.PI / len;
+        var wr = Math.cos(ang), wi = Math.sin(ang);
+        for (i = 0; i < n; i += len) {
+          var cwr = 1, cwi = 0;
+          for (j = 0; j < len / 2; j++) {
+            var ur = re[i + j], ui = im[i + j];
+            var vr = re[i + j + len / 2] * cwr - im[i + j + len / 2] * cwi;
+            var vi = re[i + j + len / 2] * cwi + im[i + j + len / 2] * cwr;
+            re[i + j] = ur + vr; im[i + j] = ui + vi;
+            re[i + j + len / 2] = ur - vr; im[i + j + len / 2] = ui - vi;
+            var nwr = cwr * wr - cwi * wi; cwi = cwr * wi + cwi * wr; cwr = nwr;
+          }
+        }
+      }
+      var mags = new Float32Array(n / 2);
+      for (i = 0; i < n / 2; i++) mags[i] = Math.sqrt(re[i] * re[i] + im[i] * im[i]);
+      return mags;
+    }
+    function analyzeBuffer(buffer) {
+      var sr = buffer.sampleRate, len = buffer.length, nch = buffer.numberOfChannels;
+      var mono = new Float32Array(len);
+      for (var c = 0; c < nch; c++) { var d = buffer.getChannelData(c); for (var s = 0; s < len; s++) mono[s] += d[s] / nch; }
+      var hop = 512, win = 1024;
+      var frames = Math.max(0, Math.floor((len - win) / hop));
+      var energy = new Float32Array(frames);
+      for (var f = 0; f < frames; f++) {
+        var off = f * hop, sum = 0;
+        for (var k = 0; k < win; k += 2) { var v = mono[off + k]; sum += v * v; }
+        energy[f] = sum;
+      }
+      var flux = new Float32Array(frames);
+      for (f = 1; f < frames; f++) flux[f] = Math.max(0, energy[f] - energy[f - 1]);
+      /* peak picking with local adaptive threshold */
+      var raw = [];
+      var W = 28, minGapSec = 0.21, lastT = -10;
+      for (f = 2; f < frames - 2; f++) {
+        if (flux[f] <= 0) continue;
+        if (flux[f] < flux[f - 1] || flux[f] < flux[f + 1]) continue;
+        var lo = Math.max(0, f - W), hi = Math.min(frames - 1, f + W), acc = 0, cnt = 0;
+        for (var q = lo; q <= hi; q++) { acc += flux[q]; cnt++; }
+        var avg = acc / cnt;
+        if (flux[f] < avg * 2.0 + 1e-9) continue;
+        var t = (f * hop) / sr;
+        if (t < 0.35 || t > buffer.duration - 0.25) continue;
+        if (t - lastT < minGapSec) { /* keep the stronger of close peaks */
+          if (raw.length && flux[f] > raw[raw.length - 1].flux) { raw[raw.length - 1] = { time: t, flux: flux[f] }; lastT = t; }
+          continue;
+        }
+        raw.push({ time: t, flux: flux[f] }); lastT = t;
+      }
+      /* density cap: about 3 notes/sec max, drop weakest first */
+      var maxNotes = Math.floor(buffer.duration * 3.0);
+      if (raw.length > maxNotes) {
+        var sorted = raw.slice().sort(function (a, b) { return b.flux - a.flux; }).slice(0, maxNotes);
+        raw = sorted.sort(function (a, b) { return a.time - b.time; });
+      }
+      /* pitch (spectral centroid) per onset */
+      var N = 2048, re = new Float32Array(N), im = new Float32Array(N);
+      raw.forEach(function (o) {
+        var center = Math.floor(o.time * sr), start = Math.max(0, Math.min(len - N, center - N / 4));
+        for (var i2 = 0; i2 < N; i2++) { var w = 0.5 - 0.5 * Math.cos(2 * Math.PI * i2 / (N - 1)); re[i2] = mono[start + i2] * w; im[i2] = 0; }
+        var mags = fftMagnitudes(re, im);
+        var num = 0, den = 0;
+        for (var b = 2; b < N / 2; b++) { var freq = b * sr / N; if (freq < 60 || freq > 5000) continue; num += freq * mags[b]; den += mags[b]; }
+        o.centroid = den > 0 ? num / den : 440;
+      });
+      /* lane thresholds from centroid quartiles so all 4 lanes get used */
+      var cents = raw.map(function (o) { return o.centroid; }).sort(function (a, b) { return a - b; });
+      function quart(p) { return cents.length ? cents[Math.min(cents.length - 1, Math.floor(cents.length * p))] : 440; }
+      var q1 = quart(0.28), q2 = quart(0.55), q3 = quart(0.80);
+      function laneForCentroid(cf) { return cf <= q1 ? 0 : cf <= q2 ? 1 : cf <= q3 ? 2 : 3; }
+      /* assign lanes, enforce per-lane min gap + avoid 3-in-a-row */
+      var out = [], lastLaneTime = [-10, -10, -10, -10];
+      raw.forEach(function (o) {
+        var lane = laneForCentroid(o.centroid);
+        if (o.time - lastLaneTime[lane] < 0.34) {
+          var alt = -1;
+          for (var dl = 1; dl <= 3; dl++) { var cand = (lane + dl) % 4; if (o.time - lastLaneTime[cand] >= 0.34) { alt = cand; break; } }
+          if (alt === -1) return; lane = alt;
+        }
+        var m = out.length;
+        if (m >= 2 && out[m - 1].lane === lane && out[m - 2].lane === lane) lane = (lane + (o.centroid >= (out[m - 1].centroid || 0) ? 1 : 3)) % 4;
+        if (o.time - lastLaneTime[lane] < 0.22) return;
+        lastLaneTime[lane] = o.time;
+        out.push({ time: o.time, lane: lane, centroid: o.centroid });
+      });
+      /* BPM estimate from onset intervals */
+      var hist = {}, bestBin = 0, bestCnt = 0;
+      for (var ii = 1; ii < raw.length; ii++) {
+        var iv = raw[ii].time - raw[ii - 1].time;
+        while (iv < 0.28) iv *= 2; while (iv > 1.0) iv /= 2;
+        if (iv < 0.28 || iv > 1.0) continue;
+        var bin = Math.round(iv / 0.025);
+        hist[bin] = (hist[bin] || 0) + 1;
+        if (hist[bin] > bestCnt) { bestCnt = hist[bin]; bestBin = bin; }
+      }
+      var bpm = bestBin ? Math.round(60 / (bestBin * 0.025)) : 110;
+      bpm = Math.max(70, Math.min(175, bpm));
+      return { notes: out, bpm: bpm };
+    }
+    function decodeAudioDataCompat(arrayBuffer) {
+      return new Promise(function (resolve, reject) {
+        var ok = false;
+        try {
+          var p = actx.decodeAudioData(arrayBuffer, function (b) { ok = true; resolve(b); }, function (e) { if (!ok) reject(e || new Error("decode failed")); });
+          if (p && p.then) p.then(function (b) { ok = true; resolve(b); }).catch(function (e) { if (!ok) reject(e); });
+        } catch (e) { reject(e); }
+      });
+    }
+    function stopCustomSource() {
+      if (customSource) { try { customSource.onended = null; customSource.stop(); } catch (e) {} customSource = null; }
     }
 
     /* ---------- audio engine ---------- */
@@ -716,6 +863,7 @@
     /* ---------- game state ---------- */
     var PERFECT_W = 0.09, GOOD_W = 0.18, APPROACH = 2.1;
     var state = "title"; /* title | playing | paused | result */
+    var resultMode = "builtin"; /* mode of the song that produced the current result screen; 「もう一度」 replays this session (custom keeps its decoded buffer + generated chart) */
     var chart = [];      /* {time, el, hit, missed} */
     var score = 0, combo = 0, maxCombo = 0, nPerfect = 0, nGood = 0, nMiss = 0;
     var joined = { rabbit: false, bird: false, kid: false };
@@ -723,48 +871,71 @@
     var danceClock = 0;  /* free-running beat clock for title/result */
 
     function songTime() { return actx ? actx.currentTime - startTime : 0; }
+    function songDuration() { return gameMode === "custom" ? customDuration : TOTAL_SEC; }
     function beatFloat() {
-      if (state === "playing" || state === "paused") return Math.max(0, songTime()) / SPB;
+      if (state === "playing" || state === "paused") return Math.max(0, songTime()) / (gameMode === "custom" ? customSPB : SPB);
       return danceClock / SPB;
     }
 
     function buildChart() {
       notesEl.innerHTML = "";
+      if (gameMode === "custom") {
+        chart = customChartData.map(function (cn) {
+          var el = document.createElement("div");
+          el.className = "note n" + cn.lane;
+          el.style.display = "none";
+          notesEl.appendChild(el);
+          return { time: cn.time, lane: cn.lane, el: el, hit: false, missed: false };
+        });
+        return;
+      }
       chart = chartNotes.map(function (cn) {
         var lane = laneForMidi(cn.midi);
         var el = document.createElement("div");
         el.className = "note n" + lane;
-        el.textContent = LANE_GLYPH[lane];
         el.style.display = "none";
         notesEl.appendChild(el);
         return { time: cn.beat * SPB, lane: lane, el: el, hit: false, missed: false };
       });
     }
 
-    function startGame() {
+    function startGame(mode) {
+      mode = mode || "builtin";
+      if (mode === "custom" && !customBuffer) return;
+      gameMode = mode;
       initAudio();
       if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
       if (actx.state === "suspended") actx.resume();
       stopScheduler();
+      stopCustomSource();
       score = 0; combo = 0; maxCombo = 0; nPerfect = 0; nGood = 0; nMiss = 0;
-      joined = { rabbit: false, bird: false, kid: false };
+      joined = { rabbit: false, bird: false, kid: true }; /* kids are cast members from the start */
       finaleDone = false; lastBeatIdx = -1; lastMilestone = 0;
       scoreEl.textContent = "0"; comboEl.textContent = "0"; progressEl.style.width = "0%";
       buildChart();
-      setCast(["bear", "bear"]);
+      setCast(["bear", "bear", "kid1", "kid2"]);
       $("panelTitle").classList.add("hidden");
       $("panelResult").classList.add("hidden");
       $("panelPause").classList.add("hidden");
       hudEl.classList.remove("hidden");
       state = "playing";
       startTime = actx.currentTime + 0.7;
-      startScheduler();
-      showBanner("♪ スタート！");
+      if (gameMode === "custom") {
+        customSource = actx.createBufferSource();
+        customSource.buffer = customBuffer;
+        customSource.connect(musicGain);
+        customSource.start(startTime);
+      } else {
+        startScheduler();
+      }
+      showBanner(gameMode === "custom" ? "♪ " + customFileName : "♪ スタート！");
     }
 
     function finishGame() {
       state = "result";
+      resultMode = gameMode; /* snapshot the finished session so retry replays the same song */
       stopScheduler();
+      stopCustomSource();
       hudEl.classList.add("hidden");
       /* finale cast: make sure everyone is on stage for the celebration */
       if (!joined.rabbit) { joined.rabbit = true; joinPair("rabbit", true); }
@@ -787,13 +958,14 @@
 
     function quitToTitle() {
       stopScheduler();
+      stopCustomSource();
       state = "title";
       hudEl.classList.add("hidden");
       notesEl.innerHTML = ""; chart = [];
       $("panelPause").classList.add("hidden");
       $("panelResult").classList.add("hidden");
       $("panelTitle").classList.remove("hidden");
-      setCast(["bear", "bear", "rabbit", "rabbit", "bird", "bird"]);
+      setCast(["bear", "bear", "rabbit", "rabbit", "bird", "bird", "kid1", "kid2"]);
     }
 
     /* ---------- judging ---------- */
@@ -850,7 +1022,8 @@
     }
     function checkFinale() {
       if (finaleDone) return;
-      if (beatFloat() < FINALE_BEAT) return;
+      if (gameMode === "custom") { if (songTime() < customDuration * 0.72) return; }
+      else if (beatFloat() < FINALE_BEAT) return;
       finaleDone = true;
       if (!joined.rabbit) { joined.rabbit = true; joinPair("rabbit", true); }
       if (!joined.bird) { joined.bird = true; joinPair("bird", true); }
@@ -890,7 +1063,7 @@
       if (state !== "playing") return;
       var t = songTime();
       checkFinale();
-      progressEl.style.width = Math.min(100, Math.max(0, t / TOTAL_SEC * 100)) + "%";
+      progressEl.style.width = Math.min(100, Math.max(0, t / songDuration() * 100)) + "%";
 
       /* notes: fall from the top of their lane down to the lane's target */
       var laneH = laneColsEl.clientHeight;
@@ -908,7 +1081,7 @@
         var y = judgeY - remain * pxPerSec;
         n.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
       }
-      if (t > TOTAL_SEC + 1.4) finishGame();
+      if (t > songDuration() + 1.4) finishGame();
     }
     requestAnimationFrame(loop);
 
@@ -928,8 +1101,60 @@
     });
     document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
 
-    $("btnStart").addEventListener("click", startGame);
-    $("btnRetry").addEventListener("click", startGame);
+    /* ---------- file picking & analysis ---------- */
+    function fmtDur(sec) { var m = Math.floor(sec / 60), s = Math.floor(sec % 60); return m + ":" + (s < 10 ? "0" : "") + s; }
+    $("btnPickFile").addEventListener("click", function () { $("fileInput").click(); });
+    $("fileInput").addEventListener("change", function () {
+      var file = this.files && this.files[0];
+      this.value = "";
+      if (!file) return;
+      var statusEl = $("fileStatus"), infoEl = $("fileInfo"), startBtn = $("btnStartCustom");
+      startBtn.classList.add("hidden");
+      statusEl.className = "fileStatus"; statusEl.textContent = "読み込み中…「" + file.name + "」";
+      initAudio();
+      if (actx.state === "suspended") actx.resume();
+      var readPromise = file.arrayBuffer ? file.arrayBuffer() : new Promise(function (res, rej) {
+        var fr = new FileReader(); fr.onload = function () { res(fr.result); }; fr.onerror = rej; fr.readAsArrayBuffer(file);
+      });
+      readPromise.then(function (ab) {
+        statusEl.textContent = "曲を解析して譜面を作っています…";
+        /* copy: decodeAudioData may detach the buffer on some browsers */
+        return decodeAudioDataCompat(ab.slice(0));
+      }).then(function (buffer) {
+        /* let the status paint before the heavy analysis blocks */
+        setTimeout(function () {
+          try {
+            var result = analyzeBuffer(buffer);
+            if (!result.notes.length) {
+              statusEl.className = "fileStatus err";
+              statusEl.textContent = "音の立ち上がりが見つかりませんでした。別の曲で試してみてね。";
+              return;
+            }
+            customBuffer = buffer;
+            customDuration = buffer.duration;
+            customChartData = result.notes;
+            customBPM = result.bpm;
+            customSPB = 60 / customBPM;
+            customFileName = file.name;
+            infoEl.innerHTML = "";
+            var b = document.createElement("b"); b.textContent = file.name; infoEl.appendChild(b);
+            infoEl.appendChild(document.createTextNode(" ・ " + fmtDur(buffer.duration) + " ・ ノーツ " + result.notes.length + " ・ 推定テンポ " + customBPM + " BPM"));
+            statusEl.textContent = "準備OK！この曲で遊べます";
+            startBtn.classList.remove("hidden");
+          } catch (err) {
+            statusEl.className = "fileStatus err";
+            statusEl.textContent = "解析に失敗しました。別のファイルで試してみてね。";
+          }
+        }, 60);
+      }).catch(function () {
+        statusEl.className = "fileStatus err";
+        statusEl.textContent = "読み込めませんでした。対応形式（m4a / mp3 / wav など）のファイルか確認してね。";
+      });
+    });
+    $("btnStartCustom").addEventListener("click", function () { startGame("custom"); });
+
+    $("btnStart").addEventListener("click", function () { startGame("builtin"); });
+    $("btnRetry").addEventListener("click", function () { startGame(resultMode); });
     $("btnToTitle").addEventListener("click", quitToTitle);
     $("btnQuit").addEventListener("click", quitToTitle);
     $("btnPause").addEventListener("click", function () {
@@ -957,8 +1182,8 @@
       }
     });
 
-    /* title screen cast: animals dancing while you read */
-    setCast(["bear", "bear", "rabbit", "rabbit", "bird", "bird"]);
+    /* title screen cast: the whole cast dancing while you read */
+    setCast(["bear", "bear", "rabbit", "rabbit", "bird", "bird", "kid1", "kid2"]);
     </script>
   </body>
 </html>
