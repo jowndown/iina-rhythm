@@ -63,31 +63,44 @@
       #progressWrap{ position:absolute; top:0; left:0; right:0; height:5px; background:rgba(255,255,255,.14); z-index:7; }
       #progressBar{ height:100%; width:0%; background:linear-gradient(90deg,var(--teal),var(--amber)); }
 
-      /* lane */
-      #lane{ position:absolute; left:0; right:0; top:16%; height:34%; min-height:120px; }
-      #laneBand{ position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
-        height:92px; background:rgba(8,26,32,.5); border-top:2px solid rgba(255,255,255,.10);
-        border-bottom:2px solid rgba(255,255,255,.10); }
-      #laneLine{ position:absolute; left:0; right:0; top:50%; height:2px; transform:translateY(-50%);
-        background:repeating-linear-gradient(90deg,rgba(255,246,230,.35) 0 14px,transparent 14px 28px); }
-      #judge{ position:absolute; left:18%; top:50%; transform:translate(-50%,-50%); width:78px; height:78px; z-index:3; }
-      #judgeRing{ position:absolute; inset:0; border-radius:50%; border:5px solid var(--amber);
-        background:rgba(255,209,102,.10); box-shadow:0 0 0 4px rgba(255,209,102,.18), 0 0 22px rgba(255,209,102,.35) inset; }
-      #judgeCore{ position:absolute; inset:26px; border-radius:50%; background:rgba(255,209,102,.35); }
-      #judge.pulse #judgeRing{ animation:jpulse .28s ease-out; }
+      /* lanes (DDR style: 4 lanes, notes fall from top to bottom) */
+      #lane{ position:absolute; left:0; right:0; top:10%; height:62%; min-height:200px; }
+      #laneCols{ position:relative; width:min(94vw,520px); height:100%; margin:0 auto;
+        display:flex; background:rgba(8,26,32,.45); border:1px solid rgba(255,255,255,.10);
+        border-radius:10px; overflow:hidden; }
+      .col{ position:relative; flex:1 1 0; border-left:1px solid rgba(255,255,255,.09); touch-action:none; }
+      .col:first-child{ border-left:none; }
+      .col:nth-child(even){ background:rgba(255,255,255,.035); }
+      .col .pad{ position:absolute; left:0; right:0; bottom:0; height:102px; pointer-events:none;
+        background:linear-gradient(180deg,transparent,rgba(255,255,255,.07) 32%);
+        border-top:1px dashed rgba(255,255,255,.14); }
+      .target{ position:absolute; left:50%; bottom:34px; transform:translateX(-50%);
+        width:64px; height:64px; pointer-events:none; }
+      .target .ring{ position:absolute; inset:0; border-radius:50%; border:4px solid var(--lane-c,#fff);
+        background:rgba(255,255,255,.06); box-shadow:0 0 14px rgba(0,0,0,.25); }
+      .target .arrow{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        font-size:26px; color:var(--lane-c,#fff); text-shadow:0 1px 4px rgba(0,0,0,.45); }
+      .target.t0{ --lane-c:var(--amber); }
+      .target.t1{ --lane-c:var(--pink); }
+      .target.t2{ --lane-c:var(--teal); }
+      .target.t3{ --lane-c:#ffb066; }
+      .target.pulse .ring{ animation:jpulse .28s ease-out; }
       @keyframes jpulse{ 0%{ transform:scale(1);} 35%{ transform:scale(1.22);} 100%{ transform:scale(1);} }
-      .note{ position:absolute; top:50%; width:52px; height:52px; margin:-26px 0 0 -26px; z-index:2;
+      .target.press .ring{ background:rgba(255,255,255,.30); }
+      .keyHint{ position:absolute; left:0; right:0; bottom:9px; text-align:center; pointer-events:none;
+        font-size:11px; font-weight:700; color:var(--ink-dim); letter-spacing:.06em; white-space:nowrap; }
+      #notes{ position:absolute; inset:0; pointer-events:none; }
+      .note{ position:absolute; left:0; top:0; width:52px; height:52px; margin:-26px 0 0 -26px; z-index:2;
         border-radius:50%; display:flex; align-items:center; justify-content:center;
-        font-size:26px; font-weight:800; color:#20303a;
+        font-size:22px; font-weight:800; color:#20303a;
         box-shadow:0 4px 10px rgba(0,0,0,.35), 0 0 0 3px rgba(255,255,255,.35) inset; will-change:transform; }
-      .note.c0{ background:radial-gradient(circle at 35% 30%,#ffe9a8,var(--amber)); }
-      .note.c1{ background:radial-gradient(circle at 35% 30%,#ffc9d6,var(--pink)); }
-      .note.c2{ background:radial-gradient(circle at 35% 30%,#c8f7e9,var(--teal)); }
-      .note.hitpop{ animation:hitpop .22s ease-out forwards; }
-      @keyframes hitpop{ to{ transform:scale(1.7); opacity:0; } }
-      .note.missed{ transition:opacity .3s, margin-top .3s; opacity:.25; margin-top:6px; }
+      .note.n0{ background:radial-gradient(circle at 35% 30%,#ffe9a8,var(--amber)); }
+      .note.n1{ background:radial-gradient(circle at 35% 30%,#ffc9d6,var(--pink)); }
+      .note.n2{ background:radial-gradient(circle at 35% 30%,#c8f7e9,var(--teal)); }
+      .note.n3{ background:radial-gradient(circle at 35% 30%,#ffd9ae,#ffb066); }
+      .note.missed{ transition:opacity .3s; opacity:.25; }
 
-      #judgePopup{ position:absolute; left:18%; top:6%; transform:translateX(-50%); z-index:5;
+      #judgePopup{ position:absolute; left:50%; bottom:112px; transform:translateX(-50%); z-index:5;
         font-size:clamp(22px,4.6vmin,38px); font-weight:800; letter-spacing:.06em; opacity:0; pointer-events:none;
         text-shadow:0 2px 10px rgba(0,0,0,.5); white-space:nowrap; }
       #judgePopup.show{ animation:pop .55s ease-out; }
@@ -101,14 +114,6 @@
         font-size:clamp(14px,2.6vmin,19px); font-weight:800; opacity:0; white-space:nowrap; }
       #banner.show{ animation:bannerIn 2.4s ease forwards; }
       @keyframes bannerIn{ 0%{ opacity:0; transform:translateX(-50%) translateY(-8px);} 12%{ opacity:1; transform:translateX(-50%) translateY(0);} 82%{ opacity:1;} 100%{ opacity:0;} }
-
-      /* big tap button */
-      #btnTap{ position:absolute; right:3.5%; bottom:4%; z-index:6; width:104px; height:104px; border-radius:50%;
-        border:4px solid rgba(255,255,255,.65); color:#20303a; font-size:21px; font-weight:800;
-        background:radial-gradient(circle at 35% 30%,#ffe9a8,var(--amber));
-        box-shadow:0 8px 22px rgba(0,0,0,.4); touch-action:none; }
-      #btnTap:active{ transform:scale(.93); }
-      #btnTap small{ display:block; font-size:12px; font-weight:700; }
 
       /* ---------- panels ---------- */
       .panel{ position:absolute; inset:0; z-index:8; display:flex; align-items:center; justify-content:center; padding:14px; }
@@ -157,8 +162,10 @@
 
       .hidden{ display:none !important; }
       @media (orientation:portrait){
-        #lane{ top:13%; height:30%; }
-        #btnTap{ width:92px; height:92px; }
+        #lane{ top:9%; height:58%; }
+        .target{ width:56px; height:56px; bottom:38px; }
+        .target .arrow{ font-size:22px; }
+        .note{ width:46px; height:46px; margin:-23px 0 0 -23px; font-size:19px; }
         #hud .box{ min-width:88px; padding:5px 10px; }
         #hud .value{ font-size:19px; }
       }
@@ -184,23 +191,41 @@
         </div>
 
         <div id="lane">
-          <div id="laneBand"></div>
-          <div id="laneLine"></div>
-          <div id="notes"></div>
-          <div id="judge"><div id="judgeRing"></div><div id="judgeCore"></div></div>
+          <div id="laneCols">
+            <div class="col" data-lane="0">
+              <div class="pad"></div>
+              <div class="target t0"><div class="ring"></div><div class="arrow">◀</div></div>
+              <div class="keyHint">D ・ ←</div>
+            </div>
+            <div class="col" data-lane="1">
+              <div class="pad"></div>
+              <div class="target t1"><div class="ring"></div><div class="arrow">▼</div></div>
+              <div class="keyHint">F ・ ↓</div>
+            </div>
+            <div class="col" data-lane="2">
+              <div class="pad"></div>
+              <div class="target t2"><div class="ring"></div><div class="arrow">▲</div></div>
+              <div class="keyHint">J ・ ↑</div>
+            </div>
+            <div class="col" data-lane="3">
+              <div class="pad"></div>
+              <div class="target t3"><div class="ring"></div><div class="arrow">▶</div></div>
+              <div class="keyHint">K ・ →</div>
+            </div>
+            <div id="notes"></div>
+          </div>
           <div id="judgePopup"></div>
           <div id="banner"></div>
         </div>
-
-        <button id="btnTap" class="hidden" type="button">タップ<small>♪ あわせてね</small></button>
 
         <div class="panel" id="panelTitle">
           <div class="card">
             <h1 class="title">いいなリズム</h1>
             <p class="subtitle">もりの なかまと おどる、ほのぼの リズムゲーム</p>
             <div class="howto">
-              <div>♪ ノーツが 左の <b>まる</b> に 重なった瞬間に タップ！</div>
-              <div>♪ 画面タップ ／ 大きなボタン ／ <b>スペースキー</b> でもOK</div>
+              <div>♪ ノーツが <b>4つのレーン</b> を 上から 落ちてくるよ</div>
+              <div>♪ レーン下の <b>矢印</b> に 重なった瞬間に、そのレーンを タップ！</div>
+              <div>♪ PCでは <b>D F J K</b> キー（矢印キーでもOK）</div>
               <div>♪ コンボを つなぐと なかまが ふえるよ</div>
               <div>♪ みんな たまに <b>でんぐり返り</b> するよ</div>
             </div>
@@ -318,9 +343,12 @@
     }
     function midiHz(m) { return 440 * Math.pow(2, (m - 69) / 12); }
 
-    /* parse melody into events [{beat, midi, durBeats}] and chart onsets */
+    /* parse melody into events [{beat, midi, durBeats}] and chart notes [{beat, midi}] */
     var melodyEvents = [];
-    var chartBeats = [4, 6]; /* intro cue taps (bar1) */
+    var chartNotes = [
+      { beat: 4, midi: noteToMidi("E5") }, /* intro cue taps (bar1) */
+      { beat: 6, midi: noteToMidi("G5") }
+    ];
     MEL.forEach(function (barStr, bar) {
       if (!barStr) return;
       var beat = bar * 4;
@@ -329,11 +357,20 @@
         var dur = parseFloat(parts[1]);
         var midi = noteToMidi(parts[0]);
         melodyEvents.push({ beat: beat, midi: midi, dur: dur });
-        chartBeats.push(beat);
+        chartNotes.push({ beat: beat, midi: midi });
         beat += dur;
       });
     });
-    chartBeats.sort(function (a, b) { return a - b; });
+    chartNotes.sort(function (a, b) { return a.beat - b.beat; });
+
+    /* 4 lanes (DDR order ◀ ▼ ▲ ▶): low notes left, high notes right */
+    var LANE_GLYPH = ["◀", "▼", "▲", "▶"];
+    function laneForMidi(m) {
+      if (m <= 74) return 0; /* B4 C5 D5 */
+      if (m <= 77) return 1; /* E5 F5 */
+      if (m <= 79) return 2; /* G5 */
+      return 3;              /* A5 B5 C6 */
+    }
 
     /* ---------- audio engine ---------- */
     var actx = null, masterGain = null, musicGain = null, sfxGain = null, noiseBuf = null;
@@ -630,9 +667,11 @@
 
     /* ---------- DOM refs ---------- */
     function $(id) { return document.getElementById(id); }
-    var laneEl = $("lane"), notesEl = $("notes"), judgeEl = $("judge"), popupEl = $("judgePopup"),
+    var laneEl = $("lane"), laneColsEl = $("laneCols"), notesEl = $("notes"), popupEl = $("judgePopup"),
         bannerEl = $("banner"), scoreEl = $("scoreVal"), comboEl = $("comboVal"),
-        progressEl = $("progressBar"), hudEl = $("hud"), btnTapEl = $("btnTap");
+        progressEl = $("progressBar"), hudEl = $("hud");
+    var colEls = Array.prototype.slice.call(document.querySelectorAll(".col"));
+    var targetEls = Array.prototype.slice.call(document.querySelectorAll(".target"));
 
     /* fireflies */
     (function () {
@@ -660,10 +699,18 @@
       void popupEl.offsetWidth;
       popupEl.className = "show " + kind;
     }
-    function pulseJudge() {
-      judgeEl.classList.remove("pulse");
-      void judgeEl.offsetWidth;
-      judgeEl.classList.add("pulse");
+    function pulseTarget(lane) {
+      var el = targetEls[lane];
+      if (!el) return;
+      el.classList.remove("pulse");
+      void el.offsetWidth;
+      el.classList.add("pulse");
+    }
+    function pressFx(lane) {
+      var el = targetEls[lane];
+      if (!el) return;
+      el.classList.add("press");
+      setTimeout(function () { el.classList.remove("press"); }, 110);
     }
 
     /* ---------- game state ---------- */
@@ -683,13 +730,14 @@
 
     function buildChart() {
       notesEl.innerHTML = "";
-      chart = chartBeats.map(function (b, i) {
+      chart = chartNotes.map(function (cn) {
+        var lane = laneForMidi(cn.midi);
         var el = document.createElement("div");
-        el.className = "note c" + (i % 3);
-        el.textContent = "♪";
+        el.className = "note n" + lane;
+        el.textContent = LANE_GLYPH[lane];
         el.style.display = "none";
         notesEl.appendChild(el);
-        return { time: b * SPB, el: el, hit: false, missed: false };
+        return { time: cn.beat * SPB, lane: lane, el: el, hit: false, missed: false };
       });
     }
 
@@ -708,7 +756,6 @@
       $("panelResult").classList.add("hidden");
       $("panelPause").classList.add("hidden");
       hudEl.classList.remove("hidden");
-      btnTapEl.classList.remove("hidden");
       state = "playing";
       startTime = actx.currentTime + 0.7;
       startScheduler();
@@ -718,7 +765,6 @@
     function finishGame() {
       state = "result";
       stopScheduler();
-      btnTapEl.classList.add("hidden");
       hudEl.classList.add("hidden");
       /* finale cast: make sure everyone is on stage for the celebration */
       if (!joined.rabbit) { joined.rabbit = true; joinPair("rabbit", true); }
@@ -742,7 +788,6 @@
     function quitToTitle() {
       stopScheduler();
       state = "title";
-      btnTapEl.classList.add("hidden");
       hudEl.classList.add("hidden");
       notesEl.innerHTML = ""; chart = [];
       $("panelPause").classList.add("hidden");
@@ -760,7 +805,7 @@
         { transform: tr + " scale(1.75)", opacity: "0" }
       ], { duration: 220, easing: "ease-out", fill: "forwards" });
       setTimeout(function () { if (note.el) note.el.style.display = "none"; }, 230);
-      pulseJudge();
+      pulseTarget(note.lane);
       if (kind === "perfect") { score += 300; nPerfect++; showPopup("perfect", "PERFECT!"); }
       else { score += 100; nGood++; showPopup("good", "GOOD"); }
       combo++; if (combo > maxCombo) maxCombo = combo;
@@ -777,13 +822,14 @@
       showPopup("miss", "MISS");
       sfxMiss();
     }
-    function hit() {
+    function hit(lane) {
       if (state !== "playing") return;
+      pressFx(lane);
       var t = songTime();
       var best = null, bd = Infinity;
       for (var i = 0; i < chart.length; i++) {
         var n = chart[i];
-        if (n.hit || n.missed) continue;
+        if (n.lane !== lane || n.hit || n.missed) continue;
         var d = t - n.time;
         if (d < -GOOD_W - 0.05) break;
         if (Math.abs(d) < Math.abs(bd)) { bd = d; best = n; }
@@ -791,7 +837,7 @@
       if (best && Math.abs(bd) <= GOOD_W) {
         applyJudge(best, Math.abs(bd) <= PERFECT_W ? "perfect" : "good");
       } else {
-        pulseJudge();
+        pulseTarget(lane);
       }
     }
     function checkJoins() {
@@ -846,11 +892,11 @@
       checkFinale();
       progressEl.style.width = Math.min(100, Math.max(0, t / TOTAL_SEC * 100)) + "%";
 
-      /* notes */
-      var laneW = laneEl.clientWidth;
-      var judgeX = laneW * 0.18;
-      judgeEl.style.left = judgeX + "px";
-      var pxPerSec = (laneW - judgeX) / APPROACH;
+      /* notes: fall from the top of their lane down to the lane's target */
+      var laneH = laneColsEl.clientHeight;
+      var laneW = laneColsEl.clientWidth;
+      var judgeY = laneH - 66; /* target centre: bottom 34px + radius 32px */
+      var pxPerSec = judgeY / APPROACH;
       for (var k = 0; k < chart.length; k++) {
         var n = chart[k];
         if (n.hit) continue;
@@ -858,24 +904,26 @@
         if (!n.missed && remain < -GOOD_W) { applyMiss(n); continue; }
         if (remain > APPROACH || remain < -0.45) { n.el.style.display = "none"; continue; }
         n.el.style.display = "flex";
-        var x = judgeX + remain * pxPerSec;
-        n.el.style.transform = "translateX(" + x.toFixed(1) + "px)";
+        var x = (n.lane + 0.5) * (laneW / 4);
+        var y = judgeY - remain * pxPerSec;
+        n.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
       }
       if (t > TOTAL_SEC + 1.4) finishGame();
     }
     requestAnimationFrame(loop);
 
-    /* ---------- input ---------- */
-    $("main").addEventListener("pointerdown", function (e) {
-      if (state !== "playing") return;
-      if (e.target.closest("button") || e.target.closest(".panel")) return;
-      hit();
-    });
-    btnTapEl.addEventListener("pointerdown", function (e) { e.preventDefault(); hit(); });
-    document.addEventListener("keydown", function (e) {
-      if (e.code === "Space") {
+    /* ---------- input: tap a lane, or D F J K / arrow keys ---------- */
+    colEls.forEach(function (col) {
+      col.addEventListener("pointerdown", function (e) {
         e.preventDefault();
-        if (!e.repeat) hit();
+        hit(parseInt(col.getAttribute("data-lane"), 10));
+      });
+    });
+    var KEYMAP = { KeyD: 0, ArrowLeft: 0, KeyF: 1, ArrowDown: 1, KeyJ: 2, ArrowUp: 2, KeyK: 3, ArrowRight: 3 };
+    document.addEventListener("keydown", function (e) {
+      if (Object.prototype.hasOwnProperty.call(KEYMAP, e.code)) {
+        e.preventDefault();
+        if (!e.repeat) hit(KEYMAP[e.code]);
       }
     });
     document.addEventListener("gesturestart", function (e) { e.preventDefault(); });
